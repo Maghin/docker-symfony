@@ -1,0 +1,77 @@
+version: '2'
+
+services:
+
+  db:
+    image: mariadb
+    restart: unless-stopped
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: srv=db
+    stdin_open: true
+    environment:
+    - MYSQL_ROOT_PASSWORD=iop
+    - MYSQL_DATABASE=symfony
+    - MYSQL_USER=symfony
+    - MYSQL_PASSWORD=symfony
+    volumes:
+    - mariadb:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: srv=db
+    stdin_open: true
+    ports:
+    - 6379:6379
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: srv=app
+    stdin_open: true
+    links:
+    - db
+    ports:
+    - "8000:80"
+    volumes:
+    - phpmyadmin:/sessions
+
+  php:
+    image: merhylstudio/symfony-php-fpm
+    restart: unless-stopped
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: srv=app
+    stdin_open: true
+    links:
+    - db
+    - redis
+    volumes:
+    - symfony:/var/www/symfony
+
+  nginx:
+    image: merhylstudio/symfony-nginx
+    restart: unless-stopped
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: srv=app
+    stdin_open: true
+    ports:
+    - 8080:80
+    links:
+    - php
+    volumes_from:
+    - php
+
+volumes:
+  mariadb:
+    driver: local
+  phpmyadmin:
+    driver: local
+  symfony:
+    driver: local
