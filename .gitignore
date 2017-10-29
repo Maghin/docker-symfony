@@ -5,3 +5,6 @@
 
 # security files
 *.key
+
+# docker volumes
+volumes
