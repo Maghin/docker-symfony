@@ -14,8 +14,8 @@
 
 # User Variables
 DRY_RUN=yes # Comment this line to disable dry run mode
-PKG_NAME="symfony" # Package or docker image name
-DOCKER_REPO="maghin" # registry[:port][/namespace]
+PKG_NAME="symfony-php-fpm" # Package or docker image name
+DOCKER_REPO="merhylstudio" # registry[:port][/namespace]
 
 
 # Function: msg_help
